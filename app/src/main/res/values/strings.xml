@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ComposeHomeRecipes</string>
+    <string name="empty_text_recipes">Whoops, there\'s no recipes yet.</string>
 </resources>

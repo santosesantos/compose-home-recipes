@@ -9,8 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RecipesLocalDataSourceImpl(
+class RecipesLocalDataSourceImpl @Inject constructor(
     private val dao: RecipeDao
 ): RecipesDataSource.Local {
     override suspend fun getAllRecipes(): Flow<List<RecipeDomain>> = withContext(Dispatchers.IO) {
