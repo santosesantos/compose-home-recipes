@@ -1,4 +1,4 @@
-package com.raktufin.composehomerecipes.features.viewmodel
+package com.raktufin.composehomerecipes.features.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,11 +7,8 @@ import com.raktufin.composehomerecipes.domain.usecases.GetAllRecipesUseCase
 import com.raktufin.composehomerecipes.domain.usecases.InsertRecipeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
@@ -35,8 +32,7 @@ class MainViewModel @Inject constructor(
             .flowOn(Dispatchers.Main)
             .onStart {
                 _state.value = MainUiState.Loading
-            }
-            .catch {
+            }.catch {
                 _state.value = MainUiState.Error(it.message.toString())
             }.collect { recipes ->
                 if (recipes.isEmpty())

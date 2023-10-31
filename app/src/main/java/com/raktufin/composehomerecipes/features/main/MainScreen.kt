@@ -1,6 +1,5 @@
-package com.raktufin.composehomerecipes.features
+package com.raktufin.composehomerecipes.features.main
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,14 +33,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.raktufin.composehomerecipes.R
 import com.raktufin.composehomerecipes.domain.models.RecipeDomain
 import com.raktufin.composehomerecipes.features.dialog.InputDialog
-import com.raktufin.composehomerecipes.features.viewmodel.MainUiState
+import com.raktufin.composehomerecipes.features.main.viewmodel.MainUiState
 import com.raktufin.composehomerecipes.ui.theme.Shapes
 
 @Composable
-fun MainScreen(state: MainUiState, insertRecipe: (String) -> Unit, cardOnClick: () -> Unit) {
+fun MainScreen(
+    state: MainUiState,
+    insertRecipe: (String) -> Unit,
+    navController: NavController,
+    alertToast: () -> Unit
+) {
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
 
     if (showDialog) {
@@ -51,8 +57,9 @@ fun MainScreen(state: MainUiState, insertRecipe: (String) -> Unit, cardOnClick: 
                 insertRecipe(it)
                 setShowDialog(false)
             },
-            title = "New Recipe",
-            placeholder = "Recipe"
+            title = "New recipe",
+            placeholder = "Recipe",
+            alertToast = alertToast
         )
     }
 
@@ -78,7 +85,7 @@ fun MainScreen(state: MainUiState, insertRecipe: (String) -> Unit, cardOnClick: 
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(state.recipes) { recipe ->
-                RecipeInfo(recipe, cardOnClick)
+                RecipeInfo(recipe) { navController.navigate("full-recipe-screen/${recipe.id}") }
             }
         }
     }
@@ -101,7 +108,12 @@ fun MainScreen(state: MainUiState, insertRecipe: (String) -> Unit, cardOnClick: 
 @Preview
 @Composable
 fun MainScreenPreview() {
-    MainScreen(state = MainUiState.Empty, insertRecipe = {}, cardOnClick = {})
+    MainScreen(
+        state = MainUiState.Empty,
+        insertRecipe = {},
+        navController = rememberNavController(),
+        {}
+    )
 }
 
 @Composable

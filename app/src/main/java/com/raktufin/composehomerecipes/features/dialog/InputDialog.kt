@@ -29,7 +29,8 @@ fun InputDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: (String) -> Unit,
     title: String,
-    placeholder: String
+    placeholder: String,
+    alertToast: () -> Unit
 ) {
     val (inputText, setInputText) = remember { mutableStateOf("") }
 
@@ -76,7 +77,12 @@ fun InputDialog(
                         Text("Dismiss")
                     }
                     TextButton(
-                        onClick = { onConfirmation(inputText) },
+                        onClick = {
+                            if (inputText.isNotEmpty())
+                                onConfirmation(inputText)
+                            else
+                                alertToast()
+                        },
                         modifier = Modifier
                             .padding(8.dp)
                     ) {

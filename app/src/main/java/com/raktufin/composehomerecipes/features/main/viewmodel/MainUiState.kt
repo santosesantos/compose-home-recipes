@@ -1,4 +1,4 @@
-package com.raktufin.composehomerecipes.features.viewmodel
+package com.raktufin.composehomerecipes.features.main.viewmodel
 
 import com.raktufin.composehomerecipes.domain.models.RecipeDomain
 
