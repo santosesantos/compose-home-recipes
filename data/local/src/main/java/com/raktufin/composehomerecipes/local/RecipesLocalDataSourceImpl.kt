@@ -54,4 +54,8 @@ class RecipesLocalDataSourceImpl @Inject constructor(
     override suspend fun delete(prepareMode: PrepareModeDomain) = withContext(Dispatchers.IO) {
         dao.delete(prepareMode.toEntity())
     }
+
+    override suspend fun delete(recipe: RecipeDomain) = withContext(Dispatchers.IO) {
+        dao.delete(recipe.toEntity())
+    }
 }

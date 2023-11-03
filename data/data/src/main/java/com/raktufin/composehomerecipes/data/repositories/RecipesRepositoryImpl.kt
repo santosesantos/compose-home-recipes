@@ -70,4 +70,11 @@ class RecipesRepositoryImpl @Inject constructor(
             name = "",
             recipeId = recipeId
         ))
+
+    override suspend fun deleteRecipe(recipeId: Int) {
+        localDataSource.delete(RecipeDomain(
+            id = recipeId,
+            name = ""
+        ))
+    }
 }

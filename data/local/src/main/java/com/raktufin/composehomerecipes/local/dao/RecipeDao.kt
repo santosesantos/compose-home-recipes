@@ -41,4 +41,7 @@ interface RecipeDao {
 
     @Delete
     fun delete(prepareMode: PrepareModeEntity)
+
+    @Delete
+    fun delete(recipe: RecipeEntity)
 }

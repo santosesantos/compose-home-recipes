@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.raktufin.composehomerecipes.features.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,7 +29,9 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,9 +54,14 @@ fun MainScreen(
     state: MainUiState,
     insertRecipe: (String) -> Unit,
     navController: NavController,
+    deleteRecipeMethod: (Int) -> Unit,
     alertToast: () -> Unit
 ) {
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
+
+    val (showDeleteDialog, setShowDeleteDialog) = remember { mutableStateOf(false) }
+    val (targetRecipeId, setTargetRecipeId) = remember { mutableIntStateOf(0) }
+    val (targetRecipeName, setTargetRecipeName) = remember { mutableStateOf("") }
 
     if (showDialog) {
         InputDialog(
@@ -60,6 +73,45 @@ fun MainScreen(
             title = "New recipe",
             placeholder = "Recipe",
             alertToast = alertToast
+        )
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            icon = {
+                Icon(Icons.Filled.Delete, contentDescription = "Delete icon")
+            },
+            title = {
+                Text(text = "Delete recipe?")
+            },
+            text = {
+                Text(text = "Are you sure you want to delete $targetRecipeName?")
+            },
+            onDismissRequest = {
+                setShowDeleteDialog(false)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleteRecipeMethod(targetRecipeId)
+                        setShowDeleteDialog(false)
+                    }
+                ) {
+                    Text(
+                        text = "Delete",
+                        color = Color(0xFFE32227)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        setShowDeleteDialog(false)
+                    }
+                ) {
+                    Text(text = "Cancel")
+                }
+            }
         )
     }
 
@@ -85,7 +137,11 @@ fun MainScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(state.recipes) { recipe ->
-                RecipeInfo(recipe) { navController.navigate("full-recipe-screen/${recipe.id}") }
+                RecipeInfo(
+                    recipe,
+                    cardOnClick = { navController.navigate("full-recipe-screen/${recipe.id}") },
+                    setShowDeleteDialog, setTargetRecipeId, setTargetRecipeName
+                )
             }
         }
     }
@@ -112,6 +168,7 @@ fun MainScreenPreview() {
         state = MainUiState.Empty,
         insertRecipe = {},
         navController = rememberNavController(),
+        {},
         {}
     )
 }
@@ -153,17 +210,29 @@ fun EmptyText() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeInfo(recipe: RecipeDomain, cardOnClick: () -> Unit) {
+fun RecipeInfo(
+    recipe: RecipeDomain,
+    cardOnClick: () -> Unit,
+    setShowDeleteDialog: (Boolean) -> Unit,
+    setTargetRecipeId: (Int) -> Unit,
+    setTargetRecipeName: (String) -> Unit
+) {
     Card(
-        enabled = true,
-        onClick = cardOnClick,
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         shape = Shapes.large,
         modifier = Modifier
+            .combinedClickable(
+                enabled = true,
+                onClick = cardOnClick,
+                onLongClick = {
+                    setTargetRecipeId(recipe.id)
+                    setTargetRecipeName(recipe.name)
+                    setShowDeleteDialog(true)
+                }
+            )
             .fillMaxWidth()
             .height(intrinsicSize = IntrinsicSize.Min)
     ) {

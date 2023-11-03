@@ -17,5 +17,6 @@ sealed interface RecipesDataSource {
         suspend fun update(prepareMode: PrepareModeDomain)
         suspend fun delete(ingredient: IngredientDomain)
         suspend fun delete(prepareMode: PrepareModeDomain)
+        suspend fun delete(recipe: RecipeDomain)
     }
 }

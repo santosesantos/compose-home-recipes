@@ -14,4 +14,5 @@ interface RecipesRepository {
     suspend fun updatePrepareMode(prepareModeId: Int, prepareModeName: String, recipeId: Int)
     suspend fun deleteIngredient(ingredientId: Int, recipeId: Int)
     suspend fun deletePrepareMode(prepareModeId: Int, recipeId: Int)
+    suspend fun deleteRecipe(recipeId: Int)
 }

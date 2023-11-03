@@ -6,6 +6,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -13,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -136,7 +138,7 @@ fun FABItem(
     @DrawableRes resId: Int = 0,
     imgVector: ImageVector? = null,
     backgroundColor: Color,
-    colorFilter : ColorFilter,
+    colorFilter: ColorFilter,
 ) {
     Box(
         modifier = modifier
@@ -160,7 +162,9 @@ fun FABItem(
         Image(
             colorFilter = colorFilter,
             modifier = Modifier.size(size),
-            painter = (if (imgVector != null) rememberVectorPainter(image = imgVector) else painterResource(resId)),
+            painter = (if (imgVector != null) rememberVectorPainter(image = imgVector) else painterResource(
+                resId
+            )),
             contentDescription = "FAB"
         )
     }

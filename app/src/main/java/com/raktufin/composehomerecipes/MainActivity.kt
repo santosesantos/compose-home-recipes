@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
                                 state,
                                 mainViewModel::insertRecipe,
                                 navController,
+                                mainViewModel::deleteRecipe,
                                 this@MainActivity::alertToast
                             )
                         }

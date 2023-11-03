@@ -3,6 +3,7 @@ package com.raktufin.composehomerecipes.features.main.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raktufin.composehomerecipes.domain.models.RecipeDomain
+import com.raktufin.composehomerecipes.domain.usecases.DeleteRecipeUseCase
 import com.raktufin.composehomerecipes.domain.usecases.GetAllRecipesUseCase
 import com.raktufin.composehomerecipes.domain.usecases.InsertRecipeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getAllRecipesUseCase: GetAllRecipesUseCase,
-    private val insertRecipeUseCase: InsertRecipeUseCase
+    private val insertRecipeUseCase: InsertRecipeUseCase,
+    private val deleteRecipeUseCase: DeleteRecipeUseCase
 ): ViewModel() {
     private val _state = MutableStateFlow<MainUiState>(MainUiState.Loading)
     val state: StateFlow<MainUiState> = _state
@@ -44,5 +46,9 @@ class MainViewModel @Inject constructor(
 
     fun insertRecipe(name: String) = viewModelScope.launch {
         insertRecipeUseCase(RecipeDomain(name = name))
+    }
+
+    fun deleteRecipe(recipeId: Int) = viewModelScope.launch {
+        deleteRecipeUseCase(recipeId)
     }
 }
