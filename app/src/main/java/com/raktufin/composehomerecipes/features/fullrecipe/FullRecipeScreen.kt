@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,7 +35,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.raktufin.composehomerecipes.domain.models.FullRecipeDomain
+import com.raktufin.composehomerecipes.domain.models.IngredientDomain
+import com.raktufin.composehomerecipes.domain.models.PrepareModeDomain
+import com.raktufin.composehomerecipes.domain.models.RecipeDomain
+import com.raktufin.composehomerecipes.extensions.innerShadow
 import com.raktufin.composehomerecipes.features.dialog.InputDialog
+import com.raktufin.composehomerecipes.features.dialog.UpdateDialog
 import com.raktufin.composehomerecipes.features.fab.ExpandableFAB
 import com.raktufin.composehomerecipes.features.fullrecipe.viewmodel.FullRecipeState
 import com.raktufin.composehomerecipes.ui.theme.Shapes
@@ -42,7 +49,13 @@ import com.raktufin.composehomerecipes.ui.theme.Shapes
 @Preview
 @Composable
 fun ScreenPreview() {
-    FullRecipeScreen(state = FullRecipeState.Error("Tonight"),{_ ->}, {_ ->}, {})
+    FullRecipeScreen(state = FullRecipeState.Success(
+        FullRecipeDomain(
+            recipe = RecipeDomain(name = "Tonight"),
+            ingredients = listOf(IngredientDomain(name = "Tonight", recipeId = 0)),
+            prepareModes = listOf(PrepareModeDomain(name = "Tonight", recipeId = 0))
+        )
+    ), { _ -> }, { _ -> }, {_, _ ->}, {_, _ ->}, {_ -> }, {_ ->}, {})
 }
 
 @Composable
@@ -50,6 +63,10 @@ fun FullRecipeScreen(
     state: FullRecipeState,
     insertIngredient: (ingredientName: String) -> Unit,
     insertPrepareMode: (prepareModeName: String) -> Unit,
+    updateIngredient: (ingredientId: Int, ingredientName: String) -> Unit,
+    updatePrepareMode: (prepareModeId: Int, prepareModeName: String) -> Unit,
+    deleteIngredient: (ingredientId: Int) -> Unit,
+    deletePrepareMode: (prepareModeId: Int) -> Unit,
     alertToast: () -> Unit
 ) {
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
@@ -58,30 +75,94 @@ fun FullRecipeScreen(
     val (dialogPlaceholder, setDialogPlaceholder) = remember { mutableStateOf("") }
     val (insertMethod, setInsertMethod) = remember { mutableStateOf(insertIngredient) }
 
+    val (isInputDialog, setIsInputDialog) = remember { mutableStateOf(true) }
+    val (updateMethod, setUpdateMethod) = remember { mutableStateOf(updateIngredient) }
+    val (deleteMethod, setDeleteMethod) = remember { mutableStateOf(deleteIngredient) }
+    val (itemName, setItemName) = remember { mutableStateOf("") }
+    val (itemId, setItemId) = remember { mutableIntStateOf(0) }
+
     if (showDialog) {
-        InputDialog(
-            onDismissRequest = { setShowDialog(false) },
-            onConfirmation = {
-                insertMethod(it)
-                setShowDialog(false)
-            },
-            title = dialogTitle,
-            placeholder = dialogPlaceholder,
-            alertToast = alertToast
-        )
+        if (isInputDialog) {
+            InputDialog(
+                onDismissRequest = { setShowDialog(false) },
+                onConfirmation = {
+                    insertMethod(it)
+                    setShowDialog(false)
+                },
+                title = dialogTitle,
+                placeholder = dialogPlaceholder,
+                alertToast = alertToast
+            )
+        } else {
+            UpdateDialog(
+                onDismissRequest = { setShowDialog(false) },
+                onUpdate = { name ->
+                    updateMethod(itemId, name)
+                    setShowDialog(false)
+                },
+                onDelete = {
+                    deleteMethod(itemId)
+                    setShowDialog(false)
+                },
+                itemName = itemName,
+                title = dialogTitle,
+                placeholder = dialogPlaceholder,
+                alertToast = alertToast
+            )
+        }
     }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(16.dp)
     ) {
-        SectionTemplate {
-            IngredientSection(state, {})
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.primary)
+                .padding(all = 8.dp)
+        ) {
+            when (state) {
+                is FullRecipeState.Success -> Text(
+                    text = state.fullRecipe.recipe.name,
+                    style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
+                )
+
+                else -> Progress()
+            }
         }
-        SectionTemplate {
-            PrepareModeSection(state, {})
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(16.dp)
+        ) {
+            SectionTemplate {
+                IngredientSection(state) { itemId, itemName ->
+                    setDialogTitle("Update ingredient")
+                    setDialogPlaceholder("Ingredient")
+                    setItemId(itemId)
+                    setItemName(itemName)
+                    setUpdateMethod(updateIngredient)
+                    setDeleteMethod(deleteIngredient)
+                    setIsInputDialog(false)
+                    setShowDialog(true)
+                }
+            }
+            SectionTemplate {
+                PrepareModeSection(state) { itemId, itemName ->
+                    setDialogTitle("Update prepare mode")
+                    setDialogPlaceholder("Prepare mode")
+                    setItemId(itemId)
+                    setItemName(itemName)
+                    setUpdateMethod(updatePrepareMode)
+                    setDeleteMethod(deletePrepareMode)
+                    setIsInputDialog(false)
+                    setShowDialog(true)
+                }
+            }
         }
     }
 
@@ -117,7 +198,7 @@ fun SectionTemplate(composable: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-fun IngredientSection(state: FullRecipeState, showDialog: () -> Unit) {
+fun IngredientSection(state: FullRecipeState, showDialog: (Int, String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,6 +226,13 @@ fun IngredientSection(state: FullRecipeState, showDialog: () -> Unit) {
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(color = MaterialTheme.colorScheme.primary, shape = Shapes.medium)
+                .innerShadow(
+                    blur = 20.dp,
+                    color = Color(0xff444444),
+                    cornersRadius = 16.dp,
+                    offsetX = 0.5.dp,
+                    offsetY = 0.5.dp
+                )
         ) {
             items(state.fullRecipe.ingredients) { ingredient ->
                 ItemList(itemId = ingredient.id, itemName = ingredient.name, showDialog)
@@ -154,7 +242,7 @@ fun IngredientSection(state: FullRecipeState, showDialog: () -> Unit) {
 }
 
 @Composable
-fun PrepareModeSection(state: FullRecipeState, showDialog: () -> Unit) {
+fun PrepareModeSection(state: FullRecipeState, showDialog: (Int, String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -182,6 +270,13 @@ fun PrepareModeSection(state: FullRecipeState, showDialog: () -> Unit) {
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(color = MaterialTheme.colorScheme.primary, shape = Shapes.medium)
+                .innerShadow(
+                    blur = 20.dp,
+                    color = Color(0xff444444),
+                    cornersRadius = 16.dp,
+                    offsetX = 0.5.dp,
+                    offsetY = 0.5.dp
+                )
         ) {
             items(state.fullRecipe.prepareModes) { prepareMode ->
                 ItemList(itemId = prepareMode.id, itemName = prepareMode.name, showDialog)
@@ -220,14 +315,14 @@ fun ErrorText(message: String) {
 }
 
 @Composable
-fun ItemList(itemId: Int, itemName: String, showDialog: () -> Unit) {
+fun ItemList(itemId: Int, itemName: String, showDialog: (Int, String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                // @TODO Edit or delete item
-                showDialog()
-            }.padding(8.dp)
+                showDialog(itemId, itemName)
+            }
+            .padding(8.dp)
     ) {
         Text(
             text = itemName,

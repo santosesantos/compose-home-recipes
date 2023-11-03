@@ -2,9 +2,13 @@ package com.raktufin.composehomerecipes.features.fullrecipe.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.raktufin.composehomerecipes.domain.usecases.DeleteIngredientUseCase
+import com.raktufin.composehomerecipes.domain.usecases.DeletePrepareModeUseCase
 import com.raktufin.composehomerecipes.domain.usecases.GetFullRecipeUseCase
 import com.raktufin.composehomerecipes.domain.usecases.InsertIngredientUseCase
 import com.raktufin.composehomerecipes.domain.usecases.InsertPrepareModeUseCase
+import com.raktufin.composehomerecipes.domain.usecases.UpdateIngredientUseCase
+import com.raktufin.composehomerecipes.domain.usecases.UpdatePrepareModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,16 +23,16 @@ import javax.inject.Inject
 class FullRecipeViewModel @Inject constructor(
     private val getFullRecipeUseCase: GetFullRecipeUseCase,
     private val insertIngredientUseCase: InsertIngredientUseCase,
-    private val insertPrepareModeUseCase: InsertPrepareModeUseCase
+    private val insertPrepareModeUseCase: InsertPrepareModeUseCase,
+    private val updateIngredientUseCase: UpdateIngredientUseCase,
+    private val updatePrepareModeUseCase: UpdatePrepareModeUseCase,
+    private val deleteIngredientUseCase: DeleteIngredientUseCase,
+    private val deletePrepareModeUseCase: DeletePrepareModeUseCase
 ): ViewModel() {
     private val _state = MutableStateFlow<FullRecipeState>(FullRecipeState.Loading)
     val state: StateFlow<FullRecipeState> = _state
 
     private var currentRecipeId: Int = 0
-
-    init {
-
-    }
 
     fun getFullRecipe(recipeId: Int) = viewModelScope.launch {
         getFullRecipeUseCase(recipeId)
@@ -49,5 +53,21 @@ class FullRecipeViewModel @Inject constructor(
 
     fun insertPrepareMode(prepareModeName: String) = viewModelScope.launch {
         insertPrepareModeUseCase(currentRecipeId, prepareModeName)
+    }
+
+    fun updateIngredient(ingredientId: Int, ingredientName: String) = viewModelScope.launch {
+        updateIngredientUseCase(ingredientId, ingredientName, currentRecipeId)
+    }
+
+    fun updatePrepareMode(prepareModeId: Int, prepareModeName: String) = viewModelScope.launch {
+        updatePrepareModeUseCase(prepareModeId, prepareModeName, currentRecipeId)
+    }
+
+    fun deleteIngredient(ingredientId: Int) = viewModelScope.launch {
+        deleteIngredientUseCase(ingredientId, currentRecipeId)
+    }
+
+    fun deletePrepareMode(prepareModeId : Int) = viewModelScope.launch {
+        deletePrepareModeUseCase(prepareModeId, currentRecipeId)
     }
 }

@@ -36,4 +36,38 @@ class RecipesRepositoryImpl @Inject constructor(
             name = prepareModeName,
             recipeId = recipeId
         ))
+
+    override suspend fun updateIngredient(
+        ingredientId: Int,
+        ingredientName: String,
+        recipeId: Int
+    ) = localDataSource.update(IngredientDomain(
+        id = ingredientId,
+        name = ingredientName,
+        recipeId = recipeId
+    ))
+
+    override suspend fun updatePrepareMode(
+        prepareModeId: Int,
+        prepareModeName: String,
+        recipeId: Int
+    ) = localDataSource.update(PrepareModeDomain(
+        id = prepareModeId,
+        name = prepareModeName,
+        recipeId = recipeId
+    ))
+
+    override suspend fun deleteIngredient(ingredientId: Int, recipeId: Int) =
+        localDataSource.delete(IngredientDomain(
+            id = ingredientId,
+            name = "",
+            recipeId = recipeId
+        ))
+
+    override suspend fun deletePrepareMode(prepareModeId: Int, recipeId: Int) =
+        localDataSource.delete(PrepareModeDomain(
+            id = prepareModeId,
+            name = "",
+            recipeId = recipeId
+        ))
 }

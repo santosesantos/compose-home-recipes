@@ -1,9 +1,11 @@
 package com.raktufin.composehomerecipes.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.raktufin.composehomerecipes.local.entities.FullRecipeEntity
 import com.raktufin.composehomerecipes.local.entities.IngredientEntity
 import com.raktufin.composehomerecipes.local.entities.PrepareModeEntity
@@ -27,4 +29,16 @@ interface RecipeDao {
 
     @Insert
     fun insert(prepareMode: PrepareModeEntity)
+
+    @Update
+    fun update(ingredient: IngredientEntity)
+
+    @Update
+    fun update(prepareMode: PrepareModeEntity)
+
+    @Delete
+    fun delete(ingredient: IngredientEntity)
+
+    @Delete
+    fun delete(prepareMode: PrepareModeEntity)
 }

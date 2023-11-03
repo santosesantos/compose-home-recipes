@@ -13,5 +13,9 @@ sealed interface RecipesDataSource {
         suspend fun getFullRecipe(recipeId: Int): Flow<FullRecipeDomain>
         suspend fun insert(ingredient: IngredientDomain)
         suspend fun insert(prepareMode: PrepareModeDomain)
+        suspend fun update(ingredient: IngredientDomain)
+        suspend fun update(prepareMode: PrepareModeDomain)
+        suspend fun delete(ingredient: IngredientDomain)
+        suspend fun delete(prepareMode: PrepareModeDomain)
     }
 }

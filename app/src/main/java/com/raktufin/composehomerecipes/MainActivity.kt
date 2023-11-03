@@ -63,6 +63,10 @@ class MainActivity : ComponentActivity() {
                                 state = state,
                                 insertIngredient = fullRecipeViewModel::insertIngredient,
                                 insertPrepareMode = fullRecipeViewModel::insertPrepareMode,
+                                updateIngredient = fullRecipeViewModel::updateIngredient,
+                                updatePrepareMode = fullRecipeViewModel::updatePrepareMode,
+                                deleteIngredient = fullRecipeViewModel::deleteIngredient,
+                                deletePrepareMode = fullRecipeViewModel::deletePrepareMode,
                                 this@MainActivity::alertToast
                             )
                         }

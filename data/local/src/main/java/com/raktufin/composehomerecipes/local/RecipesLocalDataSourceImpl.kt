@@ -38,4 +38,20 @@ class RecipesLocalDataSourceImpl @Inject constructor(
     override suspend fun insert(prepareMode: PrepareModeDomain) = withContext(Dispatchers.IO) {
         dao.insert(prepareMode.toEntity())
     }
+
+    override suspend fun update(ingredient: IngredientDomain) = withContext(Dispatchers.IO) {
+        dao.update(ingredient.toEntity())
+    }
+
+    override suspend fun update(prepareMode: PrepareModeDomain) = withContext(Dispatchers.IO) {
+        dao.update(prepareMode.toEntity())
+    }
+
+    override suspend fun delete(ingredient: IngredientDomain) = withContext(Dispatchers.IO) {
+        dao.delete(ingredient.toEntity())
+    }
+
+    override suspend fun delete(prepareMode: PrepareModeDomain) = withContext(Dispatchers.IO) {
+        dao.delete(prepareMode.toEntity())
+    }
 }
